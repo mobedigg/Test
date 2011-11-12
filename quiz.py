@@ -1,4 +1,13 @@
 ﻿#Написать функцию-фабрику, которая будет возвращать функцию сложения с аргументом.
+'''
+>>> class Image(metaclass=MetaSQL):
+...     height = Integer()
+...     width = Integer()
+...     path = Str(128)
+
+>>> print(Image.sql())
+CREATE TABLE image (height integer, width integer, path varchar(128))
+'''
 def addition(n):
     '''
     >>> add5 = addition(5) # функция addition возвращает функцию сложения с 5
@@ -16,7 +25,7 @@ def addition(n):
     def add(x):
         return x+n
     return add
-    
+
 def addition_lambda(n):
     '''
     >>> add5 = addition_lambda(5) # функция addition возвращает функцию сложения с 5
@@ -54,13 +63,13 @@ class Observable:
         at = {k:getattr(self, k) for k in atr}
         st = "{0.__class__.__name__}({1})".format(self, at)
         return st
-    
+
     def some(self):
         return self.name
 
-#Реализовать дескрипторы, которые бы фиксировали тип атрибута      
+#Реализовать дескрипторы, которые бы фиксировали тип атрибута
 class Property():
-    
+
     def __init__(self, value):
         self.val = value
 
@@ -73,7 +82,7 @@ class Property():
         else:
             raise TypeError
 
-        
+
 class Image(object):
     '''
     >>> img = Image()
@@ -94,7 +103,7 @@ class Image(object):
     size = Property(0)
 
 
-#Написать класс, который бы по всем внешним признакам был бы словарем, 
+#Написать класс, который бы по всем внешним признакам был бы словарем,
 #но позволял обращаться к ключам как к атрибутам.
 class DictAttr():
 
@@ -107,18 +116,49 @@ class DictAttr():
             return self.__dict__.get(key, val)
         else:
             return self.__dict__[key]
-    
+
     get = __getitem__
 
     def __setattr__(self, key, value):
        self.__dict__[key] = value
-    
+
     __setitem__ = __setattr__
+
+
+#Реализовать базовый класс (используя метакласс) и дескрипторы, которые бы на основе класса создавали SQL-схему (ANSI SQL) для модели:
+class Integer():
+    def __get__(self):
+        return 'integer'
+
+
+class Str():
+
+    def __init__(self, length):
+        self.length = length
+
+    def __get__(self):
+        return 'varchar({0.length})'.format(self)
+
+
+class MetaSQL(type):
+    def __new__(cls, classname, bases, dictionary):
+        def msql():
+            string = 'CREATE TABLE {tablename} ('.format(tablename=classname.lower())
+            lst = []
+            for k in dictionary:
+                if isinstance(dictionary[k], Integer):
+                    lst.append(str(k)+' integer')
+                elif isinstance(dictionary[k], Str):
+                    lst.append(str(k) + ' varchar({0.length})'.format(dictionary[k]))
+            string += ', '.join(lst) + ')'
+            return string
+        dictionary['sql'] = msql
+        return super().__new__(cls, classname, bases, dictionary)
 
 
 def _test():
     import doctest
     doctest.testmod()
-    
+
 if __name__ == '__main__':
     _test()
