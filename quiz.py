@@ -1,13 +1,4 @@
 ﻿#Написать функцию-фабрику, которая будет возвращать функцию сложения с аргументом.
-'''
->>> class Image(metaclass=MetaSQL):
-...     height = Integer()
-...     width = Integer()
-...     path = Str(128)
-
->>> print(Image.sql())
-CREATE TABLE image (height integer, width integer, path varchar(128))
-'''
 def addition(n):
     '''
     >>> add5 = addition(5) # функция addition возвращает функцию сложения с 5
@@ -42,11 +33,15 @@ def addition_lambda(n):
     '''
     return lambda x: x+n
 
+
+###############################################################################
 class Observable:
     '''
     >>> class X(Observable):
     ...     pass
     >>> x = X(foo=1, bar=5, _bazz=12, name='Amok', props=('One', 'two'))
+    >>> print(x)
+    X(bar=5, foo=1, name='Amok', props=('One', 'two'))
     >>> x.foo
     1
     >>> x.name
@@ -59,14 +54,13 @@ class Observable:
             setattr(self, i, kwargs[i])
 
     def __str__(self):
-        atr = [at for at in vars(self) if not at.startswith('_')]
-        at = {k:getattr(self, k) for k in atr}
-        st = "{0.__class__.__name__}({1})".format(self, at)
-        return st
+        pass
 
     def some(self):
         return self.name
 
+
+###############################################################################
 #Реализовать дескрипторы, которые бы фиксировали тип атрибута
 class Property():
 
@@ -103,6 +97,7 @@ class Image(object):
     size = Property(0)
 
 
+###############################################################################
 #Написать класс, который бы по всем внешним признакам был бы словарем,
 #но позволял обращаться к ключам как к атрибутам.
 class DictAttr():
@@ -125,7 +120,17 @@ class DictAttr():
     __setitem__ = __setattr__
 
 
+###############################################################################
 #Реализовать базовый класс (используя метакласс) и дескрипторы, которые бы на основе класса создавали SQL-схему (ANSI SQL) для модели:
+'''
+>>> class Image(Table):
+...     height = Integer()
+...     width = Integer()
+...     path = Str(128)
+
+>>> print(Image.sql())
+CREATE TABLE image (height integer, width integer, path varchar(128))
+'''
 class Integer():
     def __get__(self):
         return 'integer'
@@ -142,18 +147,27 @@ class Str():
 
 class MetaSQL(type):
     def __new__(cls, classname, bases, dictionary):
+
         def msql():
             string = 'CREATE TABLE {tablename} ('.format(tablename=classname.lower())
             lst = []
-            for k in dictionary:
+
+            for k in sorted(dictionary):
                 if isinstance(dictionary[k], Integer):
                     lst.append(str(k)+' integer')
                 elif isinstance(dictionary[k], Str):
                     lst.append(str(k) + ' varchar({0.length})'.format(dictionary[k]))
+
             string += ', '.join(lst) + ')'
             return string
+
         dictionary['sql'] = msql
         return super().__new__(cls, classname, bases, dictionary)
+
+
+class Table(metaclass=MetaSQL):
+    pass
+###############################################################################
 
 
 def _test():
