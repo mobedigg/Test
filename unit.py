@@ -1,7 +1,6 @@
 ﻿import random
 import unittest
 
-import prime_number
 import quiz
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -28,13 +27,7 @@ class TestSequenceFunctions(unittest.TestCase):
             random.sample(self.seq, 20)
         for element in random.sample(self.seq, 5):
             self.assertTrue(element in self.seq)
-    
-    def test_prime(self):
-        self.assertTrue(prime_number.is_prime(self.num))
-    
-    def test_addition(self):
-        self.assertEqual(prime_number.addition(5, 6), 11)
-    
+
 
 class TestQuizFunctions(unittest.TestCase):
 
@@ -42,25 +35,25 @@ class TestQuizFunctions(unittest.TestCase):
         add5 = quiz.addition(5)
         self.assertEqual(add5(3), 8)
         self.assertEqual(add5(10), 15)
-        
+
     def test_addition_lambda(self):
         add8 = quiz.addition_lambda(8)
         self.assertEqual(add8(10), 18)
-    
+
     def test_image(self):
         img = quiz.Image()
         img.height = 340
         self.assertEqual(img.height, 340)
         img.path = '/tmp/x00.jpeg'
         #self.assertRaises(TypeError, img.path = 320)
-    
+
     def test_observable(self):
         class X(quiz.Observable):
             pass
         x = X(foo=1, bar=5, _bazz=12, name='Amok', props=('One', 'two'))
         self.assertEqual(x.foo, 1)
         self.assertEqual(x.name, 'Amok')
-        
+
     def test_dict_attr(self):
         datr = quiz.DictAttr(foo = 1, bar = 'string')
         self.assertEqual(datr.foo, datr['foo'])
