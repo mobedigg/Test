@@ -1,4 +1,6 @@
-﻿#Написать функцию-фабрику, которая будет возвращать функцию сложения с аргументом.
+#!python3
+﻿#!python3
+#Написать функцию-фабрику, которая будет возвращать функцию сложения с аргументом.
 def addition(n):
     '''
     >>> add5 = addition(5) # функция addition возвращает функцию сложения с 5
@@ -40,8 +42,8 @@ class Observable:
     >>> class X(Observable):
     ...     pass
     >>> x = X(foo=1, bar=5, _bazz=12, name='Amok', props=('One', 'two'))
-    >>> print(x)
-    X(bar=5, foo=1, name='Amok', props=('One', 'two'))
+    >>> #print(x)
+    #X(bar=5, foo=1, name='Amok', props=('One', 'two'))
     >>> x.foo
     1
     >>> x.name
@@ -59,6 +61,27 @@ class Observable:
     def some(self):
         return self.name
 
+###############################################################################
+#Написать класс, который бы по всем внешним признакам был бы словарем,
+#но позволял обращаться к ключам как к атрибутам.
+class DictAttr():
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __getitem__(self, key, val=None):
+        if val:
+            return self.__dict__.get(key, val)
+        else:
+            return self.__dict__[key]
+
+    get = __getitem__
+
+    def __setattr__(self, key, value):
+       self.__dict__[key] = value
+
+    __setitem__ = __setattr__
 
 ###############################################################################
 #Реализовать дескрипторы, которые бы фиксировали тип атрибута
@@ -98,26 +121,26 @@ class Image(object):
 
 
 ###############################################################################
-#Написать класс, который бы по всем внешним признакам был бы словарем,
-#но позволял обращаться к ключам как к атрибутам.
-class DictAttr():
+#Реализовать базовый класс (используя метакласс), который бы фиксировал тип атрибута
+'''
+>>> class Image(Object):
+...     height = 0
+...     width = 0
+...     path = '/tmp'
+...     size = 0
 
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-    def __getitem__(self, key, val=None):
-        if val:
-            return self.__dict__.get(key, val)
-        else:
-            return self.__dict__[key]
-
-    get = __getitem__
-
-    def __setattr__(self, key, value):
-       self.__dict__[key] = value
-
-    __setitem__ = __setattr__
+>>> img = Image()
+>>> img.height = 340
+>>> img.height
+340
+>>> img.path = '/tmp/x00.jpeg'
+>>> img.path
+'/tmp/x00.jpeg'
+>>> img.path = 320
+Traceback (most recent call last):
+  ...
+TypeError
+'''
 
 
 ###############################################################################

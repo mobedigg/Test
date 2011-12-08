@@ -1,4 +1,6 @@
-﻿import random
+#!python3
+#!python3﻿
+import random
 import unittest
 
 import quiz
